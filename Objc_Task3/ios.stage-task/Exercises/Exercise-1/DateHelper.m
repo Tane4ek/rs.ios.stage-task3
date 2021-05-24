@@ -41,7 +41,8 @@
 
 - (BOOL)isDateInThisWeek:(NSDate *)date {
     NSDate *today = NSDate.date;
-    NSCalendar *calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierISO8601];
+    NSCalendar *calendar = NSCalendar.currentCalendar;
+    calendar.firstWeekday = 2;
     NSDateComponents *components = [calendar components:NSCalendarUnitWeekday | NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:today];
 
     NSDateComponents *componentsNew = [[NSDateComponents alloc] init];
@@ -51,11 +52,13 @@
     today = [calendar dateFromComponents:componentsNew];
 
     NSDateComponents *add = [[NSDateComponents alloc] init];
-    [add setDay: - (components.weekday - calendar.firstWeekday)];
+    NSInteger tmpWeekDay = components.weekday;
+    if (tmpWeekDay == 1)
+        tmpWeekDay = 8;
+    [add setDay: - (tmpWeekDay - calendar.firstWeekday)];
     NSDate *begin = [calendar dateByAddingComponents:add toDate:today options:0];
     [add setDay: 7];
     NSDate *end = [calendar dateByAddingComponents:add toDate:begin options:0];
     return !([date compare:begin] == NSOrderedAscending) && ([date compare:end] == NSOrderedAscending);
 }
-
 @end
